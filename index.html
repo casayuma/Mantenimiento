@@ -130,15 +130,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--sand);m
 .ldot{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
 .ld{width:7px;height:7px;border-radius:50%}
 .rooms-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:0 18px 14px}
-.rc{aspect-ratio:1;border-radius:var(--rs);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;border:2px solid transparent;position:relative;gap:1px}
+.rc{aspect-ratio:1;border-radius:var(--rs);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;border:2px solid rgba(232,220,200,.15);position:relative;gap:1px}
 .rc:active{transform:scale(.92)}
 .rc-n{font-size:17px;font-weight:600;line-height:1}
 .rc-i{font-size:10px}
-.rc.VL{background:rgba(74,124,89,.15);border-color:rgba(74,124,89,.3)}.rc.VL .rc-n{color:var(--gb)}
-.rc.OS{background:rgba(201,162,39,.12);border-color:rgba(201,162,39,.25)}.rc.OS .rc-n{color:var(--yellow)}
-.rc.M{background:rgba(184,64,64,.12);border-color:rgba(184,64,64,.25)}.rc.M .rc-n{color:var(--rb)}
-.rc.B{background:rgba(122,122,104,.15);border-color:rgba(122,122,104,.25)}.rc.B .rc-n{color:var(--muted)}
-.rc.MU{background:rgba(58,95,138,.12);border-color:rgba(58,95,138,.25)}.rc.MU .rc-n{color:var(--bb)}
+.rc.VL{background:rgba(74,124,89,.18);border-color:rgba(106,184,126,.6)}.rc.VL .rc-n{color:var(--gb)}
+.rc.OS{background:rgba(201,162,39,.15);border-color:rgba(201,162,39,.6)}.rc.OS .rc-n{color:var(--yellow)}
+.rc.M{background:rgba(184,64,64,.15);border-color:rgba(224,112,112,.6)}.rc.M .rc-n{color:var(--rb)}
+.rc.B{background:rgba(122,122,104,.18);border-color:rgba(122,122,104,.5)}.rc.B .rc-n{color:var(--muted)}
+.rc.MU{background:rgba(58,95,138,.15);border-color:rgba(106,159,216,.6)}.rc.MU .rc-n{color:var(--bb)}
 .rdot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--red)}
 .vdot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--pb)}
 .areas-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;padding:0 18px 14px}
@@ -1033,11 +1033,32 @@ function renderChecklistModal(id){
   });
 }
 async function setSt(st){
-  if(!curArea)return;
+  if(!curArea) return;
+  // Only admin and llaves can set Vacante Limpia
+  if(st==='VL' && CU.role==='mant'){
+    showToast('⚠️ Solo ama de llaves puede marcar Vacante Limpia');
+    return;
+  }
   document.querySelectorAll('.so').forEach(x=>x.classList.remove('sel'));
   document.querySelector(`.so-${st}`)?.classList.add('sel');
-  await fsUpdate(`rooms/${curArea}`, {status:st, updatedBy:CU.name, updatedAt:serverTimestamp()});
-  showToast(`${AREAS.find(x=>x.id===curArea).label} → ${{VL:'Vacante Limpia',OS:'Ocupada Sucia',M:'Mantenimiento',B:'Bloqueada',MU:'Muestra'}[st]}`);
+
+  const updateData = {status:st, updatedBy:CU.name, updatedAt:serverTimestamp()};
+
+  // Auto-reset checklist when marking as Vacante Limpia
+  if(st==='VL' && (CU.role==='admin'||CU.role==='llaves')){
+    const area = AREAS.find(x=>x.id===curArea);
+    if(area?.type==='room'){
+      const emptyChecklist = Object.fromEntries(
+        Object.values(CHECKLISTS.VL).flat().map(item=>[item, false])
+      );
+      updateData.checklist = emptyChecklist;
+    }
+  }
+
+  await fsUpdate(`rooms/${curArea}`, updateData);
+  const labels={VL:'Vacante Limpia ✅',OS:'Ocupada Sucia 🧹',M:'Mantenimiento 🔧',B:'Bloqueada 🔒',MU:'Muestra ⭐'};
+  showToast(`${AREAS.find(x=>x.id===curArea).label} → ${labels[st]}`);
+  if(st==='VL') closeM('m-room');
 }
 function openReportForArea(){closeM('m-room');document.getElementById('nr-area').value=curArea;showScr('new',null);document.querySelectorAll('.nv').forEach(n=>n.classList.remove('on'))}
 
