@@ -134,10 +134,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--sand);m
 .rc:active{transform:scale(.92)}
 .rc-n{font-size:17px;font-weight:600;line-height:1}
 .rc-i{font-size:10px}
-.rc.L{background:rgba(74,124,89,.15);border-color:rgba(74,124,89,.3)}.rc.L .rc-n{color:var(--gb)}
-.rc.S{background:rgba(201,162,39,.12);border-color:rgba(201,162,39,.25)}.rc.S .rc-n{color:var(--yellow)}
+.rc.VL{background:rgba(74,124,89,.15);border-color:rgba(74,124,89,.3)}.rc.VL .rc-n{color:var(--gb)}
+.rc.OS{background:rgba(201,162,39,.12);border-color:rgba(201,162,39,.25)}.rc.OS .rc-n{color:var(--yellow)}
 .rc.M{background:rgba(184,64,64,.12);border-color:rgba(184,64,64,.25)}.rc.M .rc-n{color:var(--rb)}
 .rc.B{background:rgba(122,122,104,.15);border-color:rgba(122,122,104,.25)}.rc.B .rc-n{color:var(--muted)}
+.rc.MU{background:rgba(58,95,138,.12);border-color:rgba(58,95,138,.25)}.rc.MU .rc-n{color:var(--bb)}
 .rdot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--red)}
 .vdot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--pb)}
 .areas-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;padding:0 18px 14px}
@@ -161,12 +162,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--sand);m
 .sp{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;padding:10px 18px 0}
 .so{padding:12px 9px;border-radius:var(--rs);border:2px solid transparent;cursor:pointer;transition:all .15s;text-align:center;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif}
 .so:active{transform:scale(.96)}
-.so-L{background:rgba(74,124,89,.12);border-color:rgba(74,124,89,.2);color:var(--gb)}
-.so-S{background:rgba(201,162,39,.10);border-color:rgba(201,162,39,.2);color:var(--yellow)}
+.so-VL{background:rgba(74,124,89,.12);border-color:rgba(74,124,89,.2);color:var(--gb)}
+.so-OS{background:rgba(201,162,39,.10);border-color:rgba(201,162,39,.2);color:var(--yellow)}
 .so-M{background:rgba(184,64,64,.10);border-color:rgba(184,64,64,.2);color:var(--rb)}
 .so-B{background:rgba(122,122,104,.12);border-color:rgba(122,122,104,.2);color:var(--muted)}
+.so-MU{background:rgba(58,95,138,.10);border-color:rgba(58,95,138,.2);color:var(--bb)}
 .so.sel{filter:brightness(1.4)}
-.so-L.sel{border-color:var(--gb)}.so-S.sel{border-color:var(--yellow)}.so-M.sel{border-color:var(--rb)}.so-B.sel{border-color:var(--muted)}
+.so-VL.sel{border-color:var(--gb)}.so-OS.sel{border-color:var(--yellow)}.so-M.sel{border-color:var(--rb)}.so-B.sel{border-color:var(--muted)}.so-MU.sel{border-color:var(--bb)}
 .cl{display:flex;flex-direction:column;gap:1px}
 .ci{display:flex;align-items:center;gap:11px;padding:11px 13px;background:var(--dark3);cursor:pointer}
 .ci:first-child{border-radius:var(--rs) var(--rs) 0 0}.ci:last-child{border-radius:0 0 var(--rs) var(--rs)}.ci:only-child{border-radius:var(--rs)}
@@ -384,10 +386,11 @@ select option{background:var(--dark2)}
       <div id="urgent-rooms-banner"></div>
       <div class="sec-hdr"><div class="sec-title">Habitaciones</div><div class="sec-sub" id="rcount"></div></div>
       <div class="legend">
-        <div class="ldot"><div class="ld" style="background:var(--gb)"></div>Limpio</div>
-        <div class="ldot"><div class="ld" style="background:var(--yellow)"></div>Sucio</div>
+        <div class="ldot"><div class="ld" style="background:var(--gb)"></div>Vacante Limpia</div>
+        <div class="ldot"><div class="ld" style="background:var(--yellow)"></div>Ocupada Sucia</div>
         <div class="ldot"><div class="ld" style="background:var(--rb)"></div>Mantenimiento</div>
-        <div class="ldot"><div class="ld" style="background:var(--muted)"></div>Bloqueado</div>
+        <div class="ldot"><div class="ld" style="background:var(--muted)"></div>Bloqueada</div>
+        <div class="ldot"><div class="ld" style="background:var(--bb)"></div>Muestra</div>
         <div class="ldot"><div class="ld" style="background:var(--pb)"></div>Por validar</div>
       </div>
       <div class="rooms-grid" id="rgrid"></div>
@@ -489,7 +492,13 @@ select option{background:var(--dark2)}
     <div class="mh"></div>
     <div class="mhdr"><div><div class="mt" id="mr-title"></div><div style="font-size:11px;color:var(--muted);margin-top:2px" id="mr-upd"></div></div><button class="mclose" onclick="closeM('m-room')">✕</button></div>
     <div class="msec-t">Cambiar estatus</div>
-    <div class="sp"><div class="so so-L" onclick="setSt('L')">✅ Limpio</div><div class="so so-S" onclick="setSt('S')">🧹 Sucio</div><div class="so so-M" onclick="setSt('M')">🔧 Mantenimiento</div><div class="so so-B" onclick="setSt('B')">🔒 Bloqueado</div></div>
+    <div class="sp">
+  <div class="so so-VL" onclick="setSt('VL')">✅ Vacante Limpia</div>
+  <div class="so so-OS" onclick="setSt('OS')">🧹 Ocupada Sucia</div>
+  <div class="so so-M" onclick="setSt('M')">🔧 Mantenimiento</div>
+  <div class="so so-B" onclick="setSt('B')">🔒 Bloqueada</div>
+  <div class="so so-MU" onclick="setSt('MU')" style="grid-column:span 2">⭐ Muestra</div>
+</div>
     <div class="msec"><div class="msec-t" style="padding:0">Checklist de inspección</div><div id="m-cl"></div></div>
     <div class="macts"><button class="btn-s" onclick="openReportForArea()">⚠️ Levantar reporte</button><button class="btn-s" onclick="closeM('m-room')">Cerrar</button></div>
   </div>
@@ -559,6 +568,7 @@ select option{background:var(--dark2)}
 // ════════════════════════════════════════════════════════
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCgq_mr3XN-CkF_j81LON4DB8MvShhul18",
@@ -571,6 +581,8 @@ const firebaseConfig = {
 
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
+const fcmMessaging = getMessaging(fbApp);
+const VAPID_KEY = "BEAjdCi92Hrg_ZXjvQsCU8uU49F-yk0BjdojUn4mUlAOKAlaepoZbwMsH5kOj1xOShZyuRtPQUD06cHVzbNlpzs";
 
 // Firestore helpers
 async function fsGet(path) {
@@ -599,60 +611,60 @@ function fsListen(col, cb, ...constraints) {
 // STAFF DATA
 // ════════════════════════════════════════════════════════
 const STAFF = [
-  // admin
-  {id:'manu',name:'Manuel Otazo',dept:'Dirección',role:'admin',ini:'MO',avc:'uav-a',pin:null},
-  // gerentes / admin
-  {id:'ami',name:'Amairani Jared Rojas Alvarado',dept:'Administración',role:'reporter',ini:'AJ',avc:'uav-s',pin:null},
-  {id:'robe',name:'Roberto Arturo Cruz Zarate',dept:'Administración',role:'reporter',ini:'RC',avc:'uav-s',pin:null},
-  {id:'chris',name:'Christian Ricardo Delgado Herrera',dept:'Compras',role:'reporter',ini:'CD',avc:'uav-s',pin:null},
-  {id:'hora',name:'Horacio Muñoz Martínez',dept:'Ventas y Eventos',role:'reporter',ini:'HM',avc:'uav-s',pin:null},
-  {id:'alej',name:'Alejandro Uriostegui Hernández',dept:'Alimentos y Bebidas',role:'reporter',ini:'AU',avc:'uav-s',pin:null},
-  {id:'rico',name:'Ricardo Ojeda Montuy',dept:'A&B',role:'reporter',ini:'RO',avc:'uav-s',pin:null},
-  {id:'marc',name:'Marcela Iznarda Villegas Acevedo',dept:'Administración',role:'reporter',ini:'MV',avc:'uav-s',pin:null},
-  // restaurante
-  {id:'ernes',name:'Ernesto Hernandez Ortiz',dept:'Restaurante',role:'reporter',ini:'EH',avc:'uav-s',pin:null},
-  {id:'misael',name:'Misael Martínez Ruiz',dept:'Restaurante',role:'reporter',ini:'MM',avc:'uav-s',pin:null},
-  {id:'scarlet',name:'Scarlet Libertad Rios Gutierrez',dept:'Restaurante',role:'reporter',ini:'SR',avc:'uav-s',pin:null},
-  {id:'emma1',name:'Emmanuel Santa María Santiago',dept:'Restaurante',role:'reporter',ini:'ES',avc:'uav-s',pin:null},
-  {id:'heri',name:'Heriberto Orozco Ramíres',dept:'Restaurante',role:'reporter',ini:'HO',avc:'uav-s',pin:null},
-  {id:'kev',name:'Kevin Alexis Martínez Valencia',dept:'Restaurante',role:'reporter',ini:'KM',avc:'uav-s',pin:null},
-  {id:'julio',name:'Julio Cesar Ramos',dept:'Bar',role:'reporter',ini:'JR',avc:'uav-s',pin:null},
-  {id:'elda',name:'Elda Cruz Ortiz',dept:'Bar',role:'reporter',ini:'EC',avc:'uav-s',pin:null},
-  {id:'luis',name:'Luis Enrique Mota Vega',dept:'Bar',role:'reporter',ini:'LM',avc:'uav-s',pin:null},
-  {id:'mahat',name:'Mahatma Juan Manuel Jimenez Maciel',dept:'Bar',role:'reporter',ini:'MJ',avc:'uav-s',pin:null},
-  {id:'emma2',name:'Emmanuel Reyes García',dept:'Bar',role:'reporter',ini:'ER',avc:'uav-s',pin:null},
-  {id:'plac',name:'Plácido Maurilio García Pérez',dept:'Cocina',role:'reporter',ini:'PG',avc:'uav-s',pin:null},
-  {id:'miriam',name:'Miriam Lopez Sanchez',dept:'Cocina',role:'reporter',ini:'ML',avc:'uav-s',pin:null},
-  {id:'fede',name:'Federico Raby Castillo',dept:'Cocina',role:'reporter',ini:'FR',avc:'uav-s',pin:null},
-  {id:'mari',name:'María del Rosario García Salvador',dept:'Cocina',role:'reporter',ini:'MG',avc:'uav-s',pin:null},
-  {id:'jaime',name:'Jaime Martínez Gómez',dept:'Cocina',role:'reporter',ini:'JM',avc:'uav-s',pin:null},
-  {id:'manu2',name:'Manuel Olivera Contreras',dept:'Cocina',role:'reporter',ini:'MO',avc:'uav-s',pin:null},
-  {id:'cande',name:'Candelaria Sánchez Lorenzo',dept:'Cocina',role:'reporter',ini:'CS',avc:'uav-s',pin:null},
-  {id:'angela',name:'Angela Francisco Vargas',dept:'Cocina',role:'reporter',ini:'AF',avc:'uav-s',pin:null},
-  {id:'nissa',name:'Nissa Navani Sanchez Jimenez',dept:'Cocina',role:'reporter',ini:'NS',avc:'uav-s',pin:null},
-  // mantenimiento
-  {id:'egbert',name:'Egbert Cruz García',dept:'Mantenimiento',role:'mant',ini:'EG',avc:'uav-m',pin:null},
-  {id:'yair',name:'Yair Gamaliel Hernandez Santiago',dept:'Mantenimiento',role:'mant',ini:'YH',avc:'uav-m',pin:null},
-  {id:'gerardo',name:'Gerardo Tereso Ruiz',dept:'Mantenimiento',role:'mant',ini:'GT',avc:'uav-m',pin:null},
-  // housekeeping
-  {id:'neri',name:'Neri Angelina Contreras Pacheco',dept:'Ama de llaves',role:'llaves',ini:'NA',avc:'uav-l',pin:null},
-  {id:'karen',name:'Karen Estrella Ventura Ruíz',dept:'Camarista',role:'llaves',ini:'KV',avc:'uav-l',pin:null},
-  {id:'magui',name:'Margarita Díaz Canseco',dept:'Camarista',role:'llaves',ini:'MD',avc:'uav-l',pin:null},
-  {id:'lucia',name:'Lucia Torres Zurita',dept:'Camarista',role:'llaves',ini:'LT',avc:'uav-l',pin:null},
-  {id:'mode',name:'Modesta Luna Hernández',dept:'Áreas Públicas',role:'llaves',ini:'ML',avc:'uav-l',pin:null},
-  {id:'geor',name:'Georgina Martínez Zarate',dept:'Áreas Públicas',role:'llaves',ini:'GM',avc:'uav-l',pin:null},
-  {id:'ita',name:'Italia Ortiz Dias',dept:'Áreas Públicas',role:'llaves',ini:'IO',avc:'uav-l',pin:null},
-  // recepción / house
-  {id:'aida',name:'Aida Carrillo Patiño',dept:'Recepción',role:'reporter',ini:'AC',avc:'uav-s',pin:null},
-  {id:'omar',name:'Omar Emiliano de la Tejera Zamorano',dept:'Recepción',role:'reporter',ini:'OT',avc:'uav-s',pin:null},
-  {id:'rodolfo',name:'Rodolfo Ramirez Perez',dept:'Recepción',role:'reporter',ini:'RR',avc:'uav-s',pin:null},
-  {id:'jesus',name:'Jesus Israel Castillo Hernández',dept:'Recepción',role:'reporter',ini:'JC',avc:'uav-s',pin:null},
-  {id:'anto',name:'Antonino Hernández Cruz',dept:'Seguridad',role:'reporter',ini:'AH',avc:'uav-s',pin:null},
-  {id:'rosa',name:'Rosalba Pacheco Ramos',dept:'Spa',role:'reporter',ini:'RP',avc:'uav-s',pin:null},
+  // Admin
+  {id:'manu',name:'Manuel Arturo Otazo Aponte',dept:'Gerencia General',role:'admin',ini:'MO',avc:'uav-a'},
+  // Administración
+  {id:'ami',name:'Amairani Jared Rojas Alvarado',dept:'Administración',role:'reporter',ini:'AJ',avc:'uav-s'},
+  {id:'robe',name:'Roberto Arturo Cruz Zarate',dept:'Administración',role:'reporter',ini:'RC',avc:'uav-s'},
+  {id:'chris',name:'Christian Ricardo Delgado Herrera',dept:'Compras',role:'reporter',ini:'CD',avc:'uav-s'},
+  {id:'hora',name:'Horacio Muñoz Martínez',dept:'Ventas y Eventos',role:'reporter',ini:'HM',avc:'uav-s'},
+  {id:'alej',name:'Alejandro Uriostegui Hernández',dept:'Alimentos y Bebidas',role:'reporter',ini:'AU',avc:'uav-s'},
+  {id:'rico',name:'Ricardo Ojeda Montuy',dept:'A&B',role:'reporter',ini:'RO',avc:'uav-s'},
+  // Restaurante
+  {id:'ernes',name:'Ernesto Hernandez Ortiz',dept:'Restaurante',role:'reporter',ini:'EH',avc:'uav-s'},
+  {id:'misael',name:'Misael Martínez Ruiz',dept:'Restaurante',role:'reporter',ini:'MM',avc:'uav-s'},
+  {id:'scarlet',name:'Scarlet Libertad Rios Gutierrez',dept:'Restaurante',role:'reporter',ini:'SR',avc:'uav-s'},
+  {id:'emma1',name:'Emmanuel Santa María Santiago',dept:'Restaurante',role:'reporter',ini:'ES',avc:'uav-s'},
+  {id:'heri',name:'Heriberto Orozco Ramíres',dept:'Restaurante',role:'reporter',ini:'HO',avc:'uav-s'},
+  {id:'kev',name:'Kevin Alexis Martínez Valencia',dept:'Restaurante',role:'reporter',ini:'KM',avc:'uav-s'},
+  {id:'julio',name:'Julio Cesar Ramos',dept:'Restaurante',role:'reporter',ini:'JR',avc:'uav-s'},
+  // Bar
+  {id:'elda',name:'Elda Cruz Ortiz',dept:'Bar',role:'reporter',ini:'EC',avc:'uav-s'},
+  {id:'luis',name:'Luis Enrique Mota Vega',dept:'Bar',role:'reporter',ini:'LM',avc:'uav-s'},
+  {id:'emma2',name:'Emmanuel Reyes García',dept:'Bar',role:'reporter',ini:'ER',avc:'uav-s'},
+  // Cocina
+  {id:'plac',name:'Plácido Maurilio García Pérez',dept:'Cocina',role:'reporter',ini:'PG',avc:'uav-s'},
+  {id:'miriam',name:'Miriam Lopez Sanchez',dept:'Cocina',role:'reporter',ini:'ML',avc:'uav-s'},
+  {id:'mari',name:'María del Rosario García Salvador',dept:'Cocina',role:'reporter',ini:'MG',avc:'uav-s'},
+  {id:'jaime',name:'Jaime Martínez Gómez',dept:'Cocina',role:'reporter',ini:'JM',avc:'uav-s'},
+  {id:'manu2',name:'Manuel Olivera Contreras',dept:'Cocina',role:'reporter',ini:'MC',avc:'uav-s'},
+  {id:'cande',name:'Candelaria Sánchez Lorenzo',dept:'Cocina',role:'reporter',ini:'CS',avc:'uav-s'},
+  {id:'angela',name:'Angela Francisco Vargas',dept:'Cocina',role:'reporter',ini:'AF',avc:'uav-s'},
+  {id:'nissa',name:'Nissa Navani Sanchez Jimenez',dept:'Cocina',role:'reporter',ini:'NS',avc:'uav-s'},
+  // Mantenimiento
+  {id:'egbert',name:'Egbert Cruz García',dept:'Mantenimiento',role:'mant',ini:'EG',avc:'uav-m'},
+  {id:'yair',name:'Yair Gamaliel Hernandez Santiago',dept:'Mantenimiento',role:'mant',ini:'YH',avc:'uav-m'},
+  {id:'gerardo',name:'Gerardo Tereso Ruiz',dept:'Mantenimiento',role:'mant',ini:'GT',avc:'uav-m'},
+  // Housekeeping
+  {id:'neri',name:'Neri Angelina Contreras Pacheco',dept:'Ama de llaves',role:'llaves',ini:'NA',avc:'uav-l'},
+  {id:'karen',name:'Karen Estrella Ventura Ruíz',dept:'Camarista',role:'llaves',ini:'KV',avc:'uav-l'},
+  {id:'magui',name:'Margarita Díaz Canseco',dept:'Camarista',role:'llaves',ini:'MD',avc:'uav-l'},
+  {id:'mode',name:'Modesta Luna Hernández',dept:'Áreas Públicas',role:'llaves',ini:'ML',avc:'uav-l'},
+  {id:'geor',name:'Georgina Martínez Zarate',dept:'Áreas Públicas',role:'llaves',ini:'GM',avc:'uav-l'},
+  {id:'ita',name:'Italia Ortiz Dias',dept:'Áreas Públicas',role:'llaves',ini:'IO',avc:'uav-l'},
+  // Recepción / House
+  {id:'aida',name:'Aida Carrillo Patiño',dept:'Recepción',role:'reporter',ini:'AC',avc:'uav-s'},
+  {id:'omar',name:'Omar Emiliano de la Tejera Zamorano',dept:'Recepción',role:'reporter',ini:'OT',avc:'uav-s'},
+  {id:'rodolfo',name:'Rodolfo Ramirez Perez',dept:'Recepción',role:'reporter',ini:'RR',avc:'uav-s'},
+  {id:'abra',name:'Abraham Leonardo Arteaga Garcia',dept:'Recepción',role:'reporter',ini:'AA',avc:'uav-s'},
+  {id:'jesus',name:'Jesus Israel Castillo Hernández',dept:'Recepción',role:'reporter',ini:'JC',avc:'uav-s'},
+  {id:'anto',name:'Antonino Hernández Cruz',dept:'Seguridad',role:'reporter',ini:'AH',avc:'uav-s'},
+  {id:'rosa',name:'Rosalba Pacheco Ramos',dept:'Spa',role:'reporter',ini:'RP',avc:'uav-s'},
 ];
 
 // PINs live in Firestore: collection "pins", doc = userId, field "pin"
 const PINS_CACHE = {}; // local cache to avoid re-fetching every keystroke
+// PIN reset: all PINs were cleared — every user creates a new one on first login
 
 const ROLE_LABELS={admin:'Administrador',mant:'Mantenimiento',llaves:'Ama de llaves / Camarista',reporter:'Staff'};
 
@@ -667,18 +679,35 @@ const AREAS=[
   {id:'cocina',label:'Cocina',type:'area',icon:'👨‍🍳'},
   {id:'bar',label:'Bar',type:'area',icon:'🍹'},
   {id:'alberca',label:'Alberca',type:'area',icon:'🏊'},
-  {id:'jardin',label:'Jardín / Exterior',type:'area',icon:'🌿'},
+  {id:'jardin',label:'Jardín',type:'area',icon:'🌿'},
   {id:'staff',label:'Área Staff',type:'area',icon:'👥'},
-  {id:'hamaca',label:'Hamock Lounge',type:'area',icon:'🌊'},
-  {id:'fogata',label:'Bonfire',type:'area',icon:'🔥'},
+  {id:'hamaca',label:'Hamaca Lounge',type:'area',icon:'🌊'},
+  {id:'fogata',label:'Fogatero',type:'area',icon:'🔥'},
   {id:'cowork',label:'Cowork',type:'area',icon:'💻'},
 ];
 
-const CHECKLIST={
-  'Baño':['Drenaje de regadera sin tapones','Agua caliente funcionando','WC sin mal olor','Tapa del WC firme','Lámpara de baño funcionando'],
-  'Cuarto':['Focos completos y mismo tono de luz','Aire acondicionado enciende','Puerta abre/cierra sin rozar','Cerradura y chapa en buen estado','Luz de entrada funcionando','WiFi funcionando'],
-  'Exterior':['Sin hojas acumuladas','Marco y pintura de puerta en buen estado'],
+// Checklists by room status
+const CHECKLISTS = {
+  VL: {
+    'Baño': ['Drenaje de regadera sin tapones','Agua caliente funcionando','WC sin mal olor','Tapa del WC firme','Lámpara de baño funcionando','Amenidades completas'],
+    'Cuarto': ['Focos completos y mismo tono de luz','A/C enciende y enfría','Puerta abre/cierra sin rozar','Cerradura y chapa en buen estado','Luz de entrada funcionando','WiFi funcionando','Cama tendida correctamente','Minibar abastecido'],
+    'Exterior': ['Sin hojas acumuladas','Marco y pintura de puerta en buen estado'],
+  },
+  OS: {
+    'Limpieza': ['Retirar ropa de cama','Limpiar baño completo','Barrer y trapear piso','Limpiar superficies y muebles','Vaciar basureros','Reponer amenidades','Revisar minibar'],
+    'Revisión': ['Reportar daños visibles','Reportar artículos olvidados','Revisar funcionamiento de A/C'],
+  },
+  M: {
+    'Mantenimiento': ['Describir trabajo a realizar en reporte','Señalizar área si es necesario','Avisar a recepción que habitación no disponible'],
+  },
+  MU: {
+    'Presentación': ['Cama perfectamente tendida','Amenidades completas y ordenadas','Luces y A/C funcionando','Minibar abastecido','Sin objetos personales visibles','Flores o decoración si aplica'],
+    'Revisión final': ['WiFi y TV funcionando','Baño impecable','Temperatura agradable'],
+  },
+  B: {},
 };
+// Backward compat alias
+const CHECKLIST = CHECKLISTS.VL;
 
 // ── Live data from Firestore ──
 const RS = {}; // room states: populated by Firestore listener
@@ -698,7 +727,7 @@ async function seedRoomsIfNeeded(){
     const batch = [];
     AREAS.forEach(a=>{
       batch.push(setDoc(doc(db,'rooms',a.id),{
-        status:'L', updatedBy:'Sistema', updatedAt:serverTimestamp(),
+        status:'VL', updatedBy:'Sistema', updatedAt:serverTimestamp(),
         checklist: a.type==='room' ? Object.fromEntries(Object.values(CHECKLIST).flat().map(c=>[c,false])) : {}
       }));
     });
@@ -859,6 +888,16 @@ async function launchApp(u){
 
   // Seed rooms if first time
   await seedRoomsIfNeeded();
+  // One-time PIN reset (v5 deploy) — wipes all PINs once, then sets a flag
+  try {
+    const flagDoc = await fsGet('config/v5_pins_reset');
+    if(!flagDoc){
+      const pinsSnap = await getDocs(collection(db,'pins'));
+      await Promise.all(pinsSnap.docs.map(d=>fsDelete(`pins/${d.id}`)));
+      await fsSet('config/v5_pins_reset',{done:true, at:serverTimestamp()});
+      console.log('✅ v5 PIN reset complete');
+    }
+  } catch(e){ console.log('PIN reset check:', e.message); }
 
   // ── Live listeners ──
   // Rooms
@@ -890,6 +929,8 @@ async function launchApp(u){
   }, orderBy('date','asc'));
 
   renderUsers();
+  // Register for push notifications
+  registerForNotifications(u);
 }
 function logout(){
   CU=null;
@@ -912,21 +953,21 @@ function showScr(n,btn){
 // ════════════════════════════════════════════════════════
 // ROOMS & AREAS
 // ════════════════════════════════════════════════════════
-const SICO={L:'✓',S:'~',M:'⚠',B:'🔒'};
+const SICO={VL:'✓',OS:'~',M:'⚠',B:'🔒',MU:'⭐'};
 function renderRooms(){
   const g=document.getElementById('rgrid'); g.innerHTML='';
-  let li=0,su=0,ma=0,bl=0;
+  let li=0,su=0,ma=0,bl=0,mu=0;
   AREAS.filter(a=>a.type==='room').forEach(a=>{
     const s=RS[a.id]; const st=s.status;
-    if(st==='L')li++;else if(st==='S')su++;else if(st==='M')ma++;else bl++;
+    if(st==='VL')li++;else if(st==='OS')su++;else if(st==='M')ma++;else if(st==='MU')mu++;else bl++;
     const hasOpen=reports.some(r=>r.areaId===a.id&&r.status==='abierto'&&r.urg==='alta');
     const hasPV=reports.some(r=>r.areaId===a.id&&r.status==='pendiente_validacion');
-    const hasAny=reports.some(r=>r.areaId===a.id&&r.status==='abierto');
+    const hasAny=reports.some(r=>r.areaId===a.id&&(r.status==='abierto'||r.status==='en_proceso'));
     const c=document.createElement('div'); c.className=`rc ${st}`;
     c.innerHTML=`${hasOpen?'<div class="rdot"></div>':hasPV?'<div class="vdot"></div>':hasAny?'<div class="rdot" style="background:var(--yellow)"></div>':''}<div class="rc-n">${a.num}</div><div class="rc-i">${SICO[st]||''}</div>`;
     c.onclick=()=>openAreaModal(a.id); g.appendChild(c);
   });
-  document.getElementById('rcount').textContent=`${li} limpias · ${su} sucias · ${ma} en mtto`;
+  document.getElementById('rcount').textContent=`${li} vacantes · ${su} ocupadas · ${ma} en mtto · ${mu} muestra`;
   renderUrgentBanner();
 }
 function renderAreas(){
@@ -964,15 +1005,21 @@ function renderChecklistModal(id){
   const c=document.getElementById('m-cl'); c.innerHTML='';
   const a=AREAS.find(x=>x.id===id);
   if(a.type!=='room'){c.innerHTML='<div style="color:var(--muted);font-size:13px;padding:4px 0">Sin checklist para esta área.</div>';return}
-  Object.entries(CHECKLIST).forEach(([g,items])=>{
+  const st=RS[id]?.status||'VL';
+  const template=CHECKLISTS[st]||{};
+  if(Object.keys(template).length===0){
+    c.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0">Sin checklist para este estatus.</div>';return;
+  }
+  Object.entries(template).forEach(([g,items])=>{
     const gt=document.createElement('div'); gt.className='cg'; gt.textContent=g; c.appendChild(gt);
     const cl=document.createElement('div'); cl.className='cl';
     items.forEach(item=>{
-      const ck=RS[id].checklist[item]||false;
+      const ck=RS[id].checklist?.[item]||false;
       const el=document.createElement('div'); el.className=`ci${ck?' ck':''}`;
       el.innerHTML=`<div class="cb">${ck?'✓':''}</div><div class="ct">${item}</div>`;
       el.onclick=async()=>{
-        const newVal=!RS[id].checklist[item];
+        const newVal=!(RS[id].checklist?.[item]||false);
+        if(!RS[id].checklist) RS[id].checklist={};
         RS[id].checklist[item]=newVal;
         el.classList.toggle('ck');
         el.querySelector('.cb').textContent=newVal?'✓':'';
@@ -988,7 +1035,7 @@ async function setSt(st){
   document.querySelectorAll('.so').forEach(x=>x.classList.remove('sel'));
   document.querySelector(`.so-${st}`)?.classList.add('sel');
   await fsUpdate(`rooms/${curArea}`, {status:st, updatedBy:CU.name, updatedAt:serverTimestamp()});
-  showToast(`${AREAS.find(x=>x.id===curArea).label} → ${{L:'Limpio',S:'Sucio',M:'Mantenimiento',B:'Bloqueado'}[st]}`);
+  showToast(`${AREAS.find(x=>x.id===curArea).label} → ${{VL:'Vacante Limpia',OS:'Ocupada Sucia',M:'Mantenimiento',B:'Bloqueada',MU:'Muestra'}[st]}`);
 }
 function openReportForArea(){closeM('m-room');document.getElementById('nr-area').value=curArea;showScr('new',null);document.querySelectorAll('.nv').forEach(n=>n.classList.remove('on'))}
 
@@ -1239,6 +1286,45 @@ function fmtDate(d){const now=new Date();const diff=now-d;if(diff<3600000)return
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
 
 // ── Expose functions to window (required for ES module + inline onclick handlers) ──
+
+// ── FCM: Register device for push notifications ──
+async function registerForNotifications(user) {
+  if (!('Notification' in window)) return;
+  if (user.role !== 'mant' && user.role !== 'llaves') return;
+
+  try {
+    // Register service worker
+    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+
+    const token = await getToken(fcmMessaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: reg,
+    });
+
+    if (token) {
+      // Save token to Firestore with user role
+      await fsSet(`fcmTokens/${user.id}`, {
+        token,
+        role: user.role,
+        name: user.name,
+        updatedAt: serverTimestamp(),
+      });
+      console.log('✅ FCM token registered for', user.name);
+    }
+  } catch (e) {
+    console.log('FCM registration skipped:', e.message);
+  }
+}
+
+// Handle foreground messages (app is open)
+onMessage(fcmMessaging, (payload) => {
+  const { title, body } = payload.notification || {};
+  if (title) showToast(`${title}: ${body}`);
+});
+
 Object.assign(window, {
   searchUsers, selectUser, pp, pdel, backToSearch,
   logout, showScr,
