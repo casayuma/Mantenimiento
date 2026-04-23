@@ -888,14 +888,16 @@ async function launchApp(u){
 
   // Seed rooms if first time
   await seedRoomsIfNeeded();
-  // One-time PIN reset (v5 deploy) — wipes all PINs once, then sets a flag
+  // One-time PIN reset (v6 deploy) — wipes all PINs, sets Manuel's PIN, then flags
   try {
-    const flagDoc = await fsGet('config/v5_pins_reset');
+    const flagDoc = await fsGet('config/v6_pins_reset');
     if(!flagDoc){
       const pinsSnap = await getDocs(collection(db,'pins'));
       await Promise.all(pinsSnap.docs.map(d=>fsDelete(`pins/${d.id}`)));
-      await fsSet('config/v5_pins_reset',{done:true, at:serverTimestamp()});
-      console.log('✅ v5 PIN reset complete');
+      // Set Manuel's PIN directly
+      await fsSet('pins/manu', {pin:'1696', userId:'manu', createdAt:serverTimestamp()});
+      await fsSet('config/v6_pins_reset',{done:true, at:serverTimestamp()});
+      console.log('✅ v6 PIN reset complete');
     }
   } catch(e){ console.log('PIN reset check:', e.message); }
 
