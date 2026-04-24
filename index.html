@@ -1313,14 +1313,24 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // ── FCM: Register device for push notifications ──
 async function registerForNotifications(user) {
   if (!('Notification' in window)) return;
-  if (user.role !== 'mant' && user.role !== 'llaves') return;
+  if (!('serviceWorker' in navigator)) return;
+  if (user.role !== 'mant' && user.role !== 'llaves' && user.role !== 'admin') return;
 
   try {
-    // Register service worker
-    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    // Auto-detect service worker path based on current location
+    const swPath = location.pathname.replace(/\/[^\/]*$/, '/') + 'firebase-messaging-sw.js';
+    console.log('Registering SW at:', swPath);
 
+    const reg = await navigator.serviceWorker.register(swPath, {scope: swPath.replace('firebase-messaging-sw.js','')});
+    await navigator.serviceWorker.ready;
+
+    // Request permission explicitly
     const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return;
+    console.log('Notification permission:', permission);
+    if (permission !== 'granted') {
+      showToast('⚠️ Activa notificaciones en ajustes del navegador');
+      return;
+    }
 
     const token = await getToken(fcmMessaging, {
       vapidKey: VAPID_KEY,
@@ -1328,7 +1338,6 @@ async function registerForNotifications(user) {
     });
 
     if (token) {
-      // Save token to Firestore with user role
       await fsSet(`fcmTokens/${user.id}`, {
         token,
         role: user.role,
@@ -1336,9 +1345,12 @@ async function registerForNotifications(user) {
         updatedAt: serverTimestamp(),
       });
       console.log('✅ FCM token registered for', user.name);
+      showToast('🔔 Notificaciones activadas');
+    } else {
+      console.log('No FCM token received');
     }
   } catch (e) {
-    console.log('FCM registration skipped:', e.message);
+    console.error('FCM registration error:', e.message);
   }
 }
 
