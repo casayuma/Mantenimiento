@@ -500,7 +500,7 @@ select option{background:var(--dark2)}
   <div class="so so-MU" onclick="setSt('MU')" style="grid-column:span 2">⭐ Muestra</div>
 </div>
     <div class="msec"><div class="msec-t" style="padding:0">Checklist de inspección</div><div id="m-cl"></div></div>
-    <div class="macts"><button class="btn-s" onclick="openReportForArea()">⚠️ Levantar reporte</button><button class="btn-s" onclick="closeM('m-room')">Cerrar</button></div>
+    <div class="macts" id="m-room-acts"><button class="btn-s" onclick="openReportForArea()">⚠️ Levantar reporte</button><button class="btn-s" onclick="closeM('m-room')">Cerrar</button></div>
   </div>
 </div>
 
@@ -653,11 +653,11 @@ const STAFF = [
   {id:'geor',name:'Georgina Martínez Zarate',dept:'Áreas Públicas',role:'llaves',ini:'GM',avc:'uav-l'},
   {id:'ita',name:'Italia Ortiz Dias',dept:'Áreas Públicas',role:'llaves',ini:'IO',avc:'uav-l'},
   // Recepción / House
-  {id:'aida',name:'Aida Carrillo Patiño',dept:'Recepción',role:'reporter',ini:'AC',avc:'uav-s'},
-  {id:'omar',name:'Omar Emiliano de la Tejera Zamorano',dept:'Recepción',role:'reporter',ini:'OT',avc:'uav-s'},
-  {id:'rodolfo',name:'Rodolfo Ramirez Perez',dept:'Recepción',role:'reporter',ini:'RR',avc:'uav-s'},
-  {id:'abra',name:'Abraham Leonardo Arteaga Garcia',dept:'Recepción',role:'reporter',ini:'AA',avc:'uav-s'},
-  {id:'jesus',name:'Jesus Israel Castillo Hernández',dept:'Recepción',role:'reporter',ini:'JC',avc:'uav-s'},
+  {id:'aida',name:'Aida Carrillo Patiño',dept:'Recepción',role:'recepcion',ini:'AC',avc:'uav-s'},
+  {id:'omar',name:'Omar Emiliano de la Tejera Zamorano',dept:'Recepción',role:'recepcion',ini:'OT',avc:'uav-s'},
+  {id:'rodolfo',name:'Rodolfo Ramirez Perez',dept:'Recepción',role:'recepcion',ini:'RR',avc:'uav-s'},
+  {id:'abra',name:'Abraham Leonardo Arteaga Garcia',dept:'Recepción',role:'recepcion',ini:'AA',avc:'uav-s'},
+  {id:'jesus',name:'Jesus Israel Castillo Hernández',dept:'Recepción',role:'recepcion',ini:'JC',avc:'uav-s'},
   {id:'anto',name:'Antonino Hernández Cruz',dept:'Seguridad',role:'reporter',ini:'AH',avc:'uav-s'},
   {id:'rosa',name:'Rosalba Pacheco Ramos',dept:'Spa',role:'reporter',ini:'RP',avc:'uav-s'},
 ];
@@ -666,7 +666,7 @@ const STAFF = [
 const PINS_CACHE = {}; // local cache to avoid re-fetching every keystroke
 // PIN reset: all PINs were cleared — every user creates a new one on first login
 
-const ROLE_LABELS={admin:'Administrador',mant:'Mantenimiento',llaves:'Ama de llaves / Camarista',reporter:'Staff'};
+const ROLE_LABELS={admin:'Administrador',mant:'Mantenimiento',llaves:'Ama de llaves / Camarista',recepcion:'Recepción',reporter:'Staff'};
 
 // ════════════════════════════════════════════════════════
 // AREAS
@@ -833,8 +833,7 @@ async function chkPin(){
 function doLogin(u){
   CU=u;
   document.getElementById('scr-login').style.display='none';
-  if(u.role==='reporter'){launchStaff(u)}
-  else{launchApp(u)}
+  launchApp(u);
 }
 
 // ════════════════════════════════════════════════════════
@@ -883,8 +882,19 @@ async function launchApp(u){
   const av=document.getElementById('hav'); av.className=`hdr-av ${u.avc}`; av.textContent=u.ini;
   document.getElementById('hname').textContent=u.name.split(' ')[0];
   document.getElementById('fab').classList.add('show');
-  if(u.role==='admin')document.getElementById('nav-users').style.display='flex';
+  if(u.role==='admin') document.getElementById('nav-users').style.display='flex';
+  // Reporter: hide FAB (can still report from room modal)
+  if(u.role==='reporter') document.getElementById('fab').style.display='none';
   populateAreaSelect();
+
+  // Load any dynamically added staff from Firestore
+  try {
+    const staffSnap = await getDocs(collection(db,'staff'));
+    staffSnap.docs.forEach(d=>{
+      const u={...d.data()};
+      if(!STAFF.find(x=>x.id===u.id)) STAFF.push(u);
+    });
+  } catch(e){ console.log('Staff load:', e.message); }
 
   // Seed rooms if first time
   await seedRoomsIfNeeded();
@@ -998,9 +1008,23 @@ function openAreaModal(id){
   document.getElementById('mr-title').textContent=a.label;
   const mins=Math.floor((Date.now()-s.updatedAt)/60000);
   document.getElementById('mr-upd').textContent=`Hace ${mins<60?mins+' min':Math.floor(mins/60)+'h'} · ${s.updatedBy}`;
-  document.querySelectorAll('.so').forEach(x=>x.classList.remove('sel'));
-  document.querySelector(`.so-${s.status}`)?.classList.add('sel');
+  const isReadOnly = CU.role==='reporter';
+  // Status picker
+  document.querySelector('.sp').style.display = isReadOnly ? 'none' : 'grid';
+  if(!isReadOnly){
+    document.querySelectorAll('.so').forEach(x=>x.classList.remove('sel'));
+    document.querySelector(`.so-${s.status}`)?.classList.add('sel');
+  }
+  // Show read-only status label for reporters
+  let roLabel=document.getElementById('m-room-status-ro');
+  if(!roLabel){roLabel=document.createElement('div');roLabel.id='m-room-status-ro';roLabel.style.cssText='padding:10px 18px 0;font-size:13px;color:var(--muted)';document.querySelector('.sp').parentNode.insertBefore(roLabel,document.querySelector('.sp'));}
+  const stNames={VL:'✅ Vacante Limpia',OS:'🧹 Ocupada Sucia',M:'🔧 Mantenimiento',B:'🔒 Bloqueada',MU:'⭐ Muestra'};
+  roLabel.textContent=isReadOnly?`Estatus actual: ${stNames[s.status]||s.status}`:'';
+  roLabel.style.display=isReadOnly?'block':'none';
   renderChecklistModal(id);
+  // Hide checklist edit for reporters
+  document.getElementById('m-cl').style.pointerEvents=isReadOnly?'none':'auto';
+  document.getElementById('m-cl').style.opacity=isReadOnly?'0.6':'1';
   document.getElementById('m-room').classList.add('open');
 }
 function renderChecklistModal(id){
@@ -1034,7 +1058,9 @@ function renderChecklistModal(id){
 }
 async function setSt(st){
   if(!curArea) return;
-  // Only admin and llaves can set Vacante Limpia
+  // Reporter cannot change status at all
+  if(CU.role==='reporter'){showToast('Solo puedes ver el tablero');return;}
+  // Only admin, llaves and recepcion can set Vacante Limpia
   if(st==='VL' && CU.role==='mant'){
     showToast('⚠️ Solo ama de llaves puede marcar Vacante Limpia');
     return;
@@ -1069,7 +1095,7 @@ function areaLabel(id){const a=AREAS.find(x=>x.id===id);return a?a.label:id}
 function renderReports(f){
   f=f||curFilter;
   const pv=document.getElementById('pv-notice'); pv.innerHTML='';
-  if(CU.role==='llaves'||CU.role==='admin'){
+  if(CU.role==='llaves'||CU.role==='admin'||CU.role==='recepcion'){
     const pvCount=reports.filter(r=>r.status==='pendiente_validacion').length;
     if(pvCount>0)pv.innerHTML=`<div style="padding:0 18px 6px"><div class="pv-banner">👁 ${pvCount} reporte${pvCount>1?'s':''} esperando tu validación</div></div>`;
   }
@@ -1274,10 +1300,30 @@ async function addCalTask(){
 function renderUsers(){
   if(!CU||CU.role!=='admin')return;
   const c=document.getElementById('users-list'); c.innerHTML='';
-  const roles=['admin','mant','llaves','reporter'];
-  const rLabels={admin:'🔑 Admin',mant:'🔧 Mantenimiento',llaves:'🧹 Housekeeping',reporter:'👤 Staff'};
+
+  // Add new user form
+  c.innerHTML=`
+    <div style="background:var(--dark3);border-radius:var(--r);padding:16px;margin-bottom:16px">
+      <div style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">➕ Agregar colaborador</div>
+      <div class="fg"><input class="finp" id="new-user-name" placeholder="Nombre completo"></div>
+      <div class="fg" style="margin-top:8px"><input class="finp" id="new-user-dept" placeholder="Departamento / Puesto"></div>
+      <div class="fg" style="margin-top:8px">
+        <select class="fsel" id="new-user-role">
+          <option value="reporter">👤 Staff (solo reportar)</option>
+          <option value="recepcion">🛎️ Recepción</option>
+          <option value="llaves">🧹 Ama de llaves</option>
+          <option value="mant">🔧 Mantenimiento</option>
+          <option value="admin">🔑 Admin</option>
+        </select>
+      </div>
+      <button class="btn-p" style="margin-top:4px" onclick="addNewUser()">Agregar</button>
+    </div>`;
+
+  const roles=['admin','mant','llaves','recepcion','reporter'];
+  const rLabels={admin:'🔑 Admin',mant:'🔧 Mantenimiento',llaves:'🧹 Housekeeping',recepcion:'🛎️ Recepción',reporter:'👤 Staff'};
   roles.forEach(role=>{
-    const group=STAFF.filter(u=>u.role===role);
+    const group=STAFF.filter(u=>u.role===role&&!u.inactive);
+    if(group.length===0) return;
     const header=document.createElement('div');
     header.style.cssText='font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px';
     header.textContent=rLabels[role];
@@ -1285,10 +1331,51 @@ function renderUsers(){
     group.forEach(u=>{
       const row=document.createElement('div'); row.className='admin-user-row';
       const hasPin=!!PINS_CACHE[u.id];
-      row.innerHTML=`<div class="aur-left"><div class="uav ${u.avc}">${u.ini}</div><div><div class="aur-name">${u.name}</div><div class="aur-role">${u.dept}</div></div></div><div style="display:flex;align-items:center;gap:8px"><div class="aur-pin">${hasPin?'PIN ✓':'Sin PIN'}</div>${hasPin?`<button class="reset-btn" onclick="resetPin('${u.id}')">Reset</button>`:''}</div>`;
+      row.innerHTML=`
+        <div class="aur-left">
+          <div class="uav ${u.avc}">${u.ini}</div>
+          <div><div class="aur-name">${u.name}</div><div class="aur-role">${u.dept}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="aur-pin">${hasPin?'PIN ✓':'Sin PIN'}</div>
+          ${hasPin?`<button class="reset-btn" onclick="resetPin('${u.id}')">Reset PIN</button>`:''}
+          ${u.id!=='manu'?`<button class="reset-btn" style="color:var(--rb);border-color:rgba(184,64,64,.3)" onclick="removeUser('${u.id}')">Eliminar</button>`:''}
+        </div>`;
       c.appendChild(row);
     });
   });
+}
+
+async function addNewUser(){
+  const name=document.getElementById('new-user-name').value.trim();
+  const dept=document.getElementById('new-user-dept').value.trim();
+  const role=document.getElementById('new-user-role').value;
+  if(!name||!dept){showToast('⚠️ Completa nombre y departamento');return}
+  const id='u'+Date.now();
+  const ini=name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const avc={admin:'uav-a',mant:'uav-m',llaves:'uav-l',recepcion:'uav-s',reporter:'uav-s'}[role];
+  const newUser={id,name,dept,role,ini,avc};
+  STAFF.push(newUser);
+  // Save to Firestore
+  await fsSet(`staff/${id}`,{...newUser,createdAt:serverTimestamp(),createdBy:CU.name});
+  document.getElementById('new-user-name').value='';
+  document.getElementById('new-user-dept').value='';
+  renderUsers();
+  showToast(`✅ ${name} agregado`);
+}
+
+async function removeUser(id){
+  const u=STAFF.find(x=>x.id===id); if(!u)return;
+  if(!confirm(`¿Eliminar a ${u.name}? Esta acción no se puede deshacer.`))return;
+  // Remove from local array
+  const idx=STAFF.findIndex(x=>x.id===id);
+  if(idx>-1) STAFF.splice(idx,1);
+  // Delete from Firestore
+  await fsDelete(`staff/${id}`);
+  await fsDelete(`pins/${id}`);
+  delete PINS_CACHE[id];
+  renderUsers();
+  showToast(`🗑️ ${u.name} eliminado`);
 }
 async function resetPin(id){
   const u=STAFF.find(x=>x.id===id); if(!u)return;
@@ -1368,7 +1455,7 @@ Object.assign(window, {
   selUrg, submitReport,
   filterH,
   calNav, toggleCTask, openNewCalTask, addCalTask,
-  resetPin,
+  resetPin, addNewUser, removeUser,
   closeM,
   selSU, staffSubmit, staffNewReport, staffLogout,
   openAreaModal,
