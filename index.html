@@ -387,7 +387,7 @@ select option{background:var(--dark2)}
       <div class="sec-hdr"><div class="sec-title">Habitaciones</div><div class="sec-sub" id="rcount"></div></div>
       <div class="legend">
         <div class="ldot"><div class="ld" style="background:var(--gb)"></div>Vacante Limpia</div>
-        <div class="ldot"><div class="ld" style="background:var(--yellow)"></div>Ocupada Sucia</div>
+        <div class="ldot"><div class="ld" style="background:var(--yellow)"></div>Ocupada Limpia</div>
         <div class="ldot"><div class="ld" style="background:var(--rb)"></div>Mantenimiento</div>
         <div class="ldot"><div class="ld" style="background:var(--muted)"></div>Bloqueada</div>
         <div class="ldot"><div class="ld" style="background:var(--bb)"></div>Muestra</div>
@@ -494,7 +494,7 @@ select option{background:var(--dark2)}
     <div class="msec-t">Cambiar estatus</div>
     <div class="sp">
   <div class="so so-VL" onclick="setSt('VL')">✅ Vacante Limpia</div>
-  <div class="so so-OS" onclick="setSt('OS')">🧹 Ocupada Sucia</div>
+  <div class="so so-OS" onclick="setSt('OS')">🛏️ Ocupada Limpia</div>
   <div class="so so-M" onclick="setSt('M')">🔧 Mantenimiento</div>
   <div class="so so-B" onclick="setSt('B')">🔒 Bloqueada</div>
   <div class="so so-MU" onclick="setSt('MU')" style="grid-column:span 2">⭐ Muestra</div>
@@ -1018,7 +1018,7 @@ function openAreaModal(id){
   // Show read-only status label for reporters
   let roLabel=document.getElementById('m-room-status-ro');
   if(!roLabel){roLabel=document.createElement('div');roLabel.id='m-room-status-ro';roLabel.style.cssText='padding:10px 18px 0;font-size:13px;color:var(--muted)';document.querySelector('.sp').parentNode.insertBefore(roLabel,document.querySelector('.sp'));}
-  const stNames={VL:'✅ Vacante Limpia',OS:'🧹 Ocupada Sucia',M:'🔧 Mantenimiento',B:'🔒 Bloqueada',MU:'⭐ Muestra'};
+  const stNames={VL:'✅ Vacante Limpia',OS:'🛏️ Ocupada Limpia',M:'🔧 Mantenimiento',B:'🔒 Bloqueada',MU:'⭐ Muestra'};
   roLabel.textContent=isReadOnly?`Estatus actual: ${stNames[s.status]||s.status}`:'';
   roLabel.style.display=isReadOnly?'block':'none';
   renderChecklistModal(id);
@@ -1082,7 +1082,7 @@ async function setSt(st){
   }
 
   await fsUpdate(`rooms/${curArea}`, updateData);
-  const labels={VL:'Vacante Limpia ✅',OS:'Ocupada Sucia 🧹',M:'Mantenimiento 🔧',B:'Bloqueada 🔒',MU:'Muestra ⭐'};
+  const labels={VL:'Vacante Limpia ✅',OS:'Ocupada Limpia 🧹',M:'Mantenimiento 🔧',B:'Bloqueada 🔒',MU:'Muestra ⭐'};
   showToast(`${AREAS.find(x=>x.id===curArea).label} → ${labels[st]}`);
   if(st==='VL') closeM('m-room');
 }
